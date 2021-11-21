@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 
 public class Snake : MonoBehaviour
 {
@@ -83,15 +85,38 @@ public class Snake : MonoBehaviour
     /// </summary>
     IEnumerator HandleMovement()
     {
-        var targetPosition = new Vector3(m_list_bodyParts[0].localPosition.x + Mathf.Cos(m_movementBearing), 0,
-            m_list_bodyParts[0].localPosition.z + Mathf.Sin(m_movementBearing));
-        var initialPosition = m_list_bodyParts[0].localPosition;
+        //get the position we want to move to next
+        //we'll have to track this per body chunk to get the classic snake-game movement style, so for now
+        //just get the target for the head and we'll loop through the rest
+        var targetPositions = new List<Vector3>
+        {
+            new Vector3(
+                m_list_bodyParts[0].localPosition.x + Mathf.Cos(m_movementBearing), 0,
+                m_list_bodyParts[0].localPosition.z + Mathf.Sin(m_movementBearing))
+        };
+
+        for (int x = 1; x < m_list_bodyParts.Count; x++)
+        {
+            //the movement target for a given body part (besides the head) is the position of the part just in front of it
+            //in the loop (keeping the loop in order i.e. swapping the tail is key here)
+            targetPositions.Add(m_list_bodyParts[x].localPosition);
+        }
+        
+        //set our initial positions for the lerp
+        var initialPositions = new List<Vector3>();
+        //we can just do a foreach here since the process is the same for all parts including the head here
+        foreach (var part in m_list_bodyParts) initialPositions.Add(part.localPosition);
+        //lerp progress
         var progress = 0f;
 
         while (progress < 1)
         {
+            //adjust the position of the head
             m_list_bodyParts[0].localPosition = Vector3.Lerp(initialPosition, targetPosition, progress);
+            
+            //increment the progress
             progress += Time.deltaTime;
+            //return from the coroutine until we're finished moving
             yield return 0;
         }
         
