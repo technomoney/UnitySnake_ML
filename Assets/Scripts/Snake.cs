@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
@@ -29,6 +30,19 @@ public class Snake : MonoBehaviour
     public bool m_growBiggerAfterMovement = false;
 
     /// <summary>
+    /// we'll use a flag to see if we're rotating the head/camera right now so we can't do it again until we're done
+    /// </summary>
+    private bool m_isHeadRotating = false;
+    private float m_headRotateSpeed = 1.9f;
+    /// <summary>
+    /// how close the head rotation needs to be to the target rotation to call it done
+    /// </summary>
+    private const float m_headRotationTolerance = 2f;
+    private float m_cameraRotateProgress = 0;
+    private Vector3 m_targetHeadRotation, m_initialHeadRotation;
+    
+
+    /// <summary>
     /// we can pause slightly between each movement
     /// </summary>
     private bool m_isPaused = false;
@@ -50,6 +64,8 @@ public class Snake : MonoBehaviour
 
     void Update()
     {
+        HandlePause();
+        
         //testing
         if (Input.GetKeyDown(KeyCode.Space))
             AddBodyChunk();
@@ -57,19 +73,57 @@ public class Snake : MonoBehaviour
             ContinueMoving();
         
         
-        //snake rotation
-        if (Input.GetKeyDown(KeyCode.E))
-            m_movementBearing -= 1.57f;
-        if (Input.GetKeyDown(KeyCode.Q))
-            m_movementBearing += 1.57f;
+        //snake rotation, only allow this if we aren't currently moving the camera/head
+        if (!m_isHeadRotating)
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                m_movementBearing -= 1.57f;
+                ClampMovementBearing();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                m_movementBearing += 1.57f;
+                ClampMovementBearing();
+            }
+        }
+
+        if (m_isHeadRotating)
+        {
+            m_list_bodyParts[0].transform.localRotation =
+                Quaternion.Lerp(Quaternion.Euler(m_initialHeadRotation), Quaternion.Euler(m_targetHeadRotation),
+                    m_cameraRotateProgress);
+            m_cameraRotateProgress += Time.deltaTime * m_headRotateSpeed;
+
+            if (m_cameraRotateProgress < 1) return;
+            Debug.Log("Done rotating");
+            m_isHeadRotating = false;
+            m_cameraRotateProgress = 0;
+            m_list_bodyParts[0].rotation = Quaternion.Euler(m_targetHeadRotation);
+            return;
+        }
         
+        //check if our head/bearing rotations are different
+        if (Mathf.Abs(m_movementBearing * Mathf.Rad2Deg - m_list_bodyParts[0].transform.localRotation.y) <
+            m_headRotationTolerance) return;
+
+        Debug.Log("getting ready to rotate, " + m_movementBearing * Mathf.Rad2Deg + " vs " +
+                  m_list_bodyParts[0].transform.localRotation.y);
+        
+        var head = m_list_bodyParts[0];
+        m_isHeadRotating = true;
+        m_initialHeadRotation = head.transform.localRotation.eulerAngles;
+        m_targetHeadRotation = new Vector3(head.localRotation.x, m_movementBearing * Mathf.Rad2Deg, head.localRotation.z);
+
+
         //rotate the camera to match the movement direction
         //let's just rotate the head, which is a sphere anyway, where the camera is a child
         //we use -deg2Rad here since we want it to face the opposite direction we're actually moving
         //todo if we have time this should be a nice lerp instead of the quick snap of the camera
-        m_list_bodyParts[0].transform.rotation = Quaternion.Euler(0, m_movementBearing*-Mathf.Rad2Deg, 0);
+        //m_list_bodyParts[0].transform.rotation = Quaternion.Euler(0, m_movementBearing*-Mathf.Rad2Deg, 0);
         
-        HandlePause();
+        
     }
 
     /// <summary>
