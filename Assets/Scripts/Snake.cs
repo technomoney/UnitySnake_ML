@@ -1,3 +1,4 @@
+using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,14 @@ public class Snake : MonoBehaviour
     /// </summary>
     private List<Transform> m_list_bodyParts;
 
+    /// <summary>
+    /// we can pause slightly between each movement
+    /// </summary>
+    private bool m_isPaused = false;
+
+    private float m_pauseTime = .5f;
+    private float m_pauseProgress = 0;
+    
     void Start()
     {
         //add the head and the tail initially to the body parts list
@@ -41,7 +50,7 @@ public class Snake : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
             AddBodyChunk();
         if(Input.GetKeyDown(KeyCode.R))
-            StartMoving();
+            ContinueMoving();
         
         
         //snake rotation
@@ -55,12 +64,14 @@ public class Snake : MonoBehaviour
         //we use -deg2Rad here since we want it to face the opposite direction we're actually moving
         //todo if we have time this should be a nice lerp instead of the quick snap of the camera
         m_list_bodyParts[0].transform.rotation = Quaternion.Euler(0, m_movementBearing*-Mathf.Rad2Deg, 0);
+        
+        HandlePause();
     }
 
     /// <summary>
     /// should only need to be called once upon game run to get the snake moving
     /// </summary>
-    private void StartMoving()
+    private void ContinueMoving()
     {
         StartCoroutine(HandleMovement());
     }
@@ -96,6 +107,19 @@ public class Snake : MonoBehaviour
         var listSize = m_list_bodyParts.Count;
         m_list_bodyParts[listSize - 1] = m_list_bodyParts[listSize - 2];
         m_list_bodyParts[listSize - 2] = newBodyChunk;
+    }
+
+    private void HandlePause()
+    {
+        if (!m_isPaused) return;
+
+        m_pauseProgress += Time.deltaTime;
+        if (m_pauseProgress < m_pauseTime) return;
+
+        m_isPaused = false;
+        m_pauseProgress = 0;
+
+        ContinueMoving();
     }
 
     /// <summary>
@@ -140,5 +164,12 @@ public class Snake : MonoBehaviour
         }
         
         //done moving
+        //when we're actually done moving start a pause
+        m_isPaused = true;
+        
+        //we should also rectify the positions of the parts by manually setting them to their targets
+        //this will remove andy weird rounding/lerp errors
+        for (int x = 0; x < m_list_bodyParts.Count; x++)
+            m_list_bodyParts[x].localPosition = targetPositions[x];
     }
 }
