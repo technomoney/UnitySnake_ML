@@ -33,6 +33,8 @@ public class Snake : MonoBehaviour
         //testing
         if (Input.GetKeyDown(KeyCode.Space))
             AddBodyChunk();
+        if(Input.GetKeyDown(KeyCode.R))
+            StartMoving();
     }
 
     /// <summary>
@@ -40,7 +42,7 @@ public class Snake : MonoBehaviour
     /// </summary>
     private void StartMoving()
     {
-        
+        StartCoroutine(HandleMovement());
     }
 
     /// <summary>
@@ -81,14 +83,18 @@ public class Snake : MonoBehaviour
     /// </summary>
     IEnumerator HandleMovement()
     {
-        var targetPosition = new Vector3(transform.position.x + Mathf.Cos(m_movementBearing), GameManager.YPosition,
-            transform.position.z + Mathf.Sin(m_movementBearing));
-        var initialPosition = transform.position;
-        var progress = 0;
+        var targetPosition = new Vector3(m_list_bodyParts[0].localPosition.x + Mathf.Cos(m_movementBearing), 0,
+            m_list_bodyParts[0].localPosition.z + Mathf.Sin(m_movementBearing));
+        var initialPosition = m_list_bodyParts[0].localPosition;
+        var progress = 0f;
 
         while (progress < 1)
         {
+            m_list_bodyParts[0].localPosition = Vector3.Lerp(initialPosition, targetPosition, progress);
+            progress += Time.deltaTime;
             yield return 0;
         }
+        
+        //done moving
     }
 }
