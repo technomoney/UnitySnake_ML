@@ -31,7 +31,7 @@ public class Snake : MonoBehaviour
     /// </summary>
     private bool m_isPaused = false;
 
-    private float m_pauseTime = .5f;
+    private float m_pauseTime = .1f;
     private float m_pauseProgress = 0;
     
     void Start()
@@ -93,7 +93,7 @@ public class Snake : MonoBehaviour
     /// <summary>
     /// add a chunk to the snake
     /// </summary>
-    private void AddBodyChunk()
+    public void AddBodyChunk()
     {
         //make the cube and parent it under the main snake object
         var chunk = Instantiate(pfb_bodyChunk, transform);

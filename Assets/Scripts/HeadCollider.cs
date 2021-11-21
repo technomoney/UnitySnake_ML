@@ -1,10 +1,15 @@
 using System;
+using System.Linq;
 using UnityEngine;
 
 public class HeadCollider : MonoBehaviour
 {
+    //we need a ref to the snake so we can make him grow big and strong, assigned in inspector
+    public Snake m_snake;
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("Collided with: " + other.tag);
+        if (!other.tag.Equals("Food")) return;
+        
+        m_snake.AddBodyChunk();
     }
 }
