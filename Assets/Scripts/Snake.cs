@@ -61,6 +61,8 @@ public class Snake : MonoBehaviour
         AddBodyChunk();
         AddBodyChunk();
         AddBodyChunk();
+        
+        ContinueMoving();
     }
 
     void Update()
@@ -70,8 +72,6 @@ public class Snake : MonoBehaviour
         //testing
         if (Input.GetKeyDown(KeyCode.Space))
             AddBodyChunk();
-        if (Input.GetKeyDown(KeyCode.R))
-            ContinueMoving();
 
 
         //snake rotation, only allow this if we aren't currently moving the camera/head

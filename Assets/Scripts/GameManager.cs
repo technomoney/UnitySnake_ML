@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -22,11 +23,16 @@ public class GameManager : MonoBehaviour
     void Update()
     {
         m_text_score.text = "Score: " + Score;
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        }
     }
 
     public void ShowGameOver()
     {
-        m_text_banner.text = " Game Over! \nR to restart";
+        m_text_banner.text = " Game Over! \nP to restart";
         snake.m_isStopped = true;
     }
 }
