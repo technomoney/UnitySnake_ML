@@ -41,6 +41,16 @@ public class Snake : MonoBehaviour
             AddBodyChunk();
         if(Input.GetKeyDown(KeyCode.R))
             StartMoving();
+        
+        
+        //snake rotation
+        if (Input.GetKeyDown(KeyCode.E))
+            m_movementBearing -= 1.57f;
+        if (Input.GetKeyDown(KeyCode.Q))
+            m_movementBearing += 1.57f;
+        
+        //rotate the camera to match the movement direction
+        
     }
 
     /// <summary>
