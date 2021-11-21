@@ -33,10 +33,14 @@ public class Snake : MonoBehaviour
     public bool m_growBiggerAfterMovement = false;
 
     /// <summary>
+    /// control how fast the snake moves
+    /// </summary>
+    private float m_moveSpeed = 5f;
+
+    /// <summary>
     /// we can pause slightly between each movement
     /// </summary>
     private bool m_isPaused = false;
-
     private float m_pauseTime = .07f;
     private float m_pauseProgress = 0;
     
@@ -181,7 +185,7 @@ public class Snake : MonoBehaviour
                 m_list_bodyParts[x].localPosition = Vector3.Lerp(initialPositions[x], targetPositions[x], progress);
             
             //increment the progress
-            progress += Time.deltaTime;
+            progress += Time.deltaTime*m_moveSpeed;
             //return from the coroutine until we're finished moving
             yield return 0;
         }
