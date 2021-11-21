@@ -10,9 +10,18 @@ public class HeadCollider : MonoBehaviour
     public Food m_food;
     private void OnTriggerEnter(Collider other)
     {
-        if (!other.tag.Equals("Food")) return;
+        if (other.tag.Equals("Food"))
+        {
+            m_snake.m_growBiggerAfterMovement = true;
+            m_food.Respawn();
+            return;
+        }
 
-        m_snake.m_growBiggerAfterMovement = true;
-        m_food.Respawn();
+        if (other.tag.Equals("Body"))
+        {
+            Debug.Log("gg");
+            GameManager.Inst.ShowGameOver();
+        }
+        
     }
 }

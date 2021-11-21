@@ -39,13 +39,18 @@ public class Snake : MonoBehaviour
     private const float m_headRotationTolerance = 2f;
     private float m_cameraRotateProgress = 0;
     private Vector3 m_targetHeadRotation, m_initialHeadRotation;
+
+    /// <summary>
+    /// we can use this flag to halt the snake from ever getting out of pause, so he'll just stop
+    /// </summary>
+    public bool m_isStopped;
     
 
     /// <summary>
     /// we can pause slightly between each movement
     /// </summary>
     private bool m_isPaused = false;
-    private float m_pauseTime = .15f;
+    private float m_pauseTime = .25f;
     private float m_pauseProgress = 0;
     
     void Start()
@@ -53,9 +58,6 @@ public class Snake : MonoBehaviour
         //add the head and the tail initially to the body parts list
         m_list_bodyParts = new List<Transform> { transform.Find("Snake_Head"), transform.Find("Snake_Tail") };
         
-        AddBodyChunk();
-        AddBodyChunk();
-        AddBodyChunk();
         AddBodyChunk();
         AddBodyChunk();
         AddBodyChunk();
@@ -93,6 +95,11 @@ public class Snake : MonoBehaviour
         //we use -deg2Rad here since we want it to face the opposite direction we're actually moving
         //todo if we have time this should be a nice lerp instead of the quick snap of the camera
         m_list_bodyParts[0].transform.rotation = Quaternion.Euler(0, m_movementBearing * -Mathf.Rad2Deg, 0);
+    }
+
+    public void StopMoving()
+    {
+        
     }
 
     /// <summary>
@@ -141,7 +148,7 @@ public class Snake : MonoBehaviour
         tail.transform.localPosition = newPos;
         
         //every time we add a chunk, increase our score
-        GameManager.Score++;
+        GameManager.Inst.Score++;
     }
 
     /// <summary>
@@ -158,7 +165,7 @@ public class Snake : MonoBehaviour
 
     private void HandlePause()
     {
-        if (!m_isPaused) return;
+        if (!m_isPaused|| m_isStopped) return;
 
         m_pauseProgress += Time.deltaTime;
         if (m_pauseProgress < m_pauseTime) return;
@@ -182,8 +189,9 @@ public class Snake : MonoBehaviour
         {
             //the movement target for a given body part (besides the head) is the position of the part just in front of it
             //in the loop (keeping the loop in order i.e. swapping the tail is key here)
-            targetPositions.Add(m_list_bodyParts[x-1].localPosition);
+            targetPositions.Add(m_list_bodyParts[x - 1].localPosition);
         }
+
         //we should also rectify the positions of the parts by manually setting them to their targets
         //this will remove andy weird rounding/lerp errors
         //we use the conditional check in the count to check against the list sizes of body parts and target positions
@@ -192,33 +200,28 @@ public class Snake : MonoBehaviour
         for (int x = 0; x < m_list_bodyParts.Count - (targetPositions.Count == m_list_bodyParts.Count ? 0 : 1); x++)
         {
             m_list_bodyParts[x].localPosition = targetPositions[x];
-            
+
             //lets also just check if we've moved to the other end of the world
             //todo this is a little ugly, fix this if we have time
             var part = m_list_bodyParts[x];
             if (part.localPosition.x < -40) part.localPosition = new Vector3(40, 0, 0);
             if (part.localPosition.x > 40) part.localPosition = new Vector3(-40, 0, 0);
             if (part.localPosition.z < -40) part.localPosition = new Vector3(0, 0, 40);
-            if (part.localPosition.z > 40) part.localPosition = new Vector3(0,0, -40);
+            if (part.localPosition.z > 40) part.localPosition = new Vector3(0, 0, -40);
         }
-        
+
         //done moving
         //when we're actually done moving start a pause
         m_isPaused = true;
-        
+
         //see if we ate something and need to grow
         if (m_growBiggerAfterMovement)
         {
             AddBodyChunk();
             m_growBiggerAfterMovement = false; //reset the flag
         }
-        
+
         //lets also fix the rotation of the tail
         m_list_bodyParts.Last().transform.rotation = Quaternion.Euler(0, m_movementBearing * -Mathf.Rad2Deg, 0);
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("collided with " + other.tag);
     }
 }

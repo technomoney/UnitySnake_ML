@@ -6,23 +6,27 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public Snake snake;
-    public static int Score;
+    public int Score;
+    public static GameManager Inst;
 
-    public TextMeshProUGUI m_text;
+    public TextMeshProUGUI m_text_score, m_text_banner;
     // Start is called before the first frame update
     void Start()
     {
-        m_text.text = string.Empty;
+        Inst = this;
+        m_text_score.text = string.Empty;
         Score = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        //update our testing info
+        m_text_score.text = "Score: " + Score;
+    }
 
-        m_text.text = "Bearing: " + snake.m_movementBearing + "("+snake.m_movementBearing* Mathf.Rad2Deg+")"+"\n" +
-                      "Head: " + snake.m_list_bodyParts[0].localRotation.eulerAngles.y+"\n"+
-                      "Score: " + Score;
+    public void ShowGameOver()
+    {
+        m_text_banner.text = " Game Over! \nR to restart";
+        snake.m_isStopped = true;
     }
 }
