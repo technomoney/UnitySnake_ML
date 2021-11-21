@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using UnityEngine;
+using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
 
 public class Snake : MonoBehaviour
@@ -50,7 +51,10 @@ public class Snake : MonoBehaviour
             m_movementBearing += 1.57f;
         
         //rotate the camera to match the movement direction
-        
+        //let's just rotate the head, which is a sphere anyway, where the camera is a child
+        //we use -deg2Rad here since we want it to face the opposite direction we're actually moving
+        //todo if we have time this should be a nice lerp instead of the quick snap of the camera
+        m_list_bodyParts[0].transform.rotation = Quaternion.Euler(0, m_movementBearing*-Mathf.Rad2Deg, 0);
     }
 
     /// <summary>
