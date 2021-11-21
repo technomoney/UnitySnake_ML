@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -6,12 +7,13 @@ using Vector3 = UnityEngine.Vector3;
 
 public class Snake : MonoBehaviour
 {
+    #region Variables
+    
     /// <summary>
     /// Prefab to make new parts of the snake body, assign in inspector
     /// </summary>
     public Transform pfb_bodyChunk;
-
-
+    
     /// <summary>
     /// the current direction the snake is moving, in rads
     /// </summary>
@@ -29,53 +31,38 @@ public class Snake : MonoBehaviour
     public bool m_growBiggerAfterMovement = false;
 
     /// <summary>
-    /// we'll use a flag to see if we're rotating the head/camera right now so we can't do it again until we're done
-    /// </summary>
-    private bool m_isHeadRotating = false;
-    private float m_headRotateSpeed = 1.9f;
-    /// <summary>
-    /// how close the head rotation needs to be to the target rotation to call it done
-    /// </summary>
-    private const float m_headRotationTolerance = 2f;
-    private float m_cameraRotateProgress = 0;
-    private Vector3 m_targetHeadRotation, m_initialHeadRotation;
-
-    /// <summary>
     /// we can use this flag to halt the snake from ever getting out of pause, so he'll just stop
     /// </summary>
     public bool m_isStopped;
-    
 
     /// <summary>
-    /// we can pause slightly between each movement
+    /// How long do we pause between movement steps
     /// </summary>
-    private bool m_isPaused = false;
-    private float m_pauseTime = .25f;
-    private float m_pauseProgress = 0;
+    private const float PauseTime = .25f;
+    
+    #endregion
     
     void Start()
     {
         //add the head and the tail initially to the body parts list
         m_list_bodyParts = new List<Transform> { transform.Find("Snake_Head"), transform.Find("Snake_Tail") };
         
+        //add the three starting body chunks
         AddBodyChunk();
         AddBodyChunk();
         AddBodyChunk();
-        
-        ContinueMoving();
+
+        //do a single pause, which will get us moving once it completes
+        StartCoroutine(HandlePause());
     }
 
     void Update()
     {
-        HandlePause();
-
-        //testing
+        //this is cheating, but is useful for testing...
         if (Input.GetKeyDown(KeyCode.Space))
             AddBodyChunk();
 
-
-        //snake rotation, only allow this if we aren't currently moving the camera/head
-
+        //check for rotation of the movement direction
         if (Input.GetKeyDown(KeyCode.E))
         {
             m_movementBearing -= 1.57f;
@@ -88,18 +75,11 @@ public class Snake : MonoBehaviour
             ClampMovementBearing();
         }
 
-
-
         //rotate the camera to match the movement direction
         //let's just rotate the head, which is a sphere anyway, where the camera is a child
         //we use -deg2Rad here since we want it to face the opposite direction we're actually moving
         //todo if we have time this should be a nice lerp instead of the quick snap of the camera
         m_list_bodyParts[0].transform.rotation = Quaternion.Euler(0, m_movementBearing * -Mathf.Rad2Deg, 0);
-    }
-
-    public void StopMoving()
-    {
-        
     }
 
     /// <summary>
@@ -116,18 +96,9 @@ public class Snake : MonoBehaviour
     }
 
     /// <summary>
-    /// should only need to be called once upon game run to get the snake moving
-    /// </summary>
-    private void ContinueMoving()
-    {
-        //StartCoroutine(HandleMovement());
-        HandleMovement();
-    }
-
-    /// <summary>
     /// add a chunk to the snake
     /// </summary>
-    public void AddBodyChunk()
+    private void AddBodyChunk()
     {
         //make the cube and parent it under the main snake object
         var chunk = Instantiate(pfb_bodyChunk, transform);
@@ -137,7 +108,6 @@ public class Snake : MonoBehaviour
         MoveTailToEndOfList();
         
         //put the new chunk right where the tail currently is, then we'll bump the tail accordingly
-        //chunk.transform.localPosition = new Vector3((m_list_bodyParts.Count - 2) * -1, 0, 0);
         chunk.transform.localPosition = m_list_bodyParts.Last().localPosition;
         
         //we'll need to move the tail to stay behind everything else
@@ -163,19 +133,9 @@ public class Snake : MonoBehaviour
         m_list_bodyParts[listSize - 2] = newBodyChunk;
     }
 
-    private void HandlePause()
-    {
-        if (!m_isPaused|| m_isStopped) return;
-
-        m_pauseProgress += Time.deltaTime;
-        if (m_pauseProgress < m_pauseTime) return;
-
-        m_isPaused = false;
-        m_pauseProgress = 0;
-
-        ContinueMoving();
-    }
-
+    /// <summary>
+    /// scoot each element of the snake one unit ahead in the direction we're facing
+    /// </summary>
     private void HandleMovement()
     {
         var targetPositions = new List<Vector3>
@@ -212,7 +172,7 @@ public class Snake : MonoBehaviour
 
         //done moving
         //when we're actually done moving start a pause
-        m_isPaused = true;
+        StartCoroutine(HandlePause());
 
         //see if we ate something and need to grow
         if (m_growBiggerAfterMovement)
@@ -223,5 +183,25 @@ public class Snake : MonoBehaviour
 
         //lets also fix the rotation of the tail
         m_list_bodyParts.Last().transform.rotation = Quaternion.Euler(0, m_movementBearing * -Mathf.Rad2Deg, 0);
+    }
+
+    /// <summary>
+    /// simple way to delay the calling of the next handlemovement()
+    /// Adjust the speed in the PauseTime const
+    /// </summary>
+    /// <returns></returns>
+    IEnumerator HandlePause()
+    {
+        var progress = 0f;
+
+        while (progress < PauseTime)
+        {
+            progress += Time.deltaTime;
+            yield return 0;
+        }
+
+        //this will stop us from moving
+        if (!m_isStopped)
+            HandleMovement();
     }
 }
