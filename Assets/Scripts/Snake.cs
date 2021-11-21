@@ -27,6 +27,10 @@ public class Snake : MonoBehaviour
     {
         //add the head and the tail initially to the body parts list
         m_list_bodyParts = new List<Transform> { transform.Find("Snake_Head"), transform.Find("Snake_Tail") };
+        
+        AddBodyChunk();
+        AddBodyChunk();
+        AddBodyChunk();
 
     }
 
@@ -56,15 +60,15 @@ public class Snake : MonoBehaviour
         var chunk = Instantiate(pfb_bodyChunk, transform);
         m_list_bodyParts.Add(chunk);
         
-        //plop the new part right behind the head
-        chunk.transform.localPosition = new Vector3(0, 0, (m_list_bodyParts.Count - 1) * -1);
+        //plop the new part right behind the head, we use the -2 here since we don't need to count the head/tail
+        chunk.transform.localPosition = new Vector3(0, 0, (m_list_bodyParts.Count - 2) * -1);
         
         //let's keep the tail at the back of the list
         MoveTailToEndOfList();
         
         //we'll need to move the tail to stay behind everything else
         var tail = m_list_bodyParts.Last();
-        tail.transform.localPosition = new Vector3(0, 0, (m_list_bodyParts.Count) * -1);
+        tail.transform.localPosition = new Vector3(0, 0, (m_list_bodyParts.Count-1) * -1);
 
     }
 
@@ -99,7 +103,7 @@ public class Snake : MonoBehaviour
         {
             //the movement target for a given body part (besides the head) is the position of the part just in front of it
             //in the loop (keeping the loop in order i.e. swapping the tail is key here)
-            targetPositions.Add(m_list_bodyParts[x].localPosition);
+            targetPositions.Add(m_list_bodyParts[x-1].localPosition);
         }
         
         //set our initial positions for the lerp
@@ -111,8 +115,9 @@ public class Snake : MonoBehaviour
 
         while (progress < 1)
         {
-            //adjust the position of the head
-            m_list_bodyParts[0].localPosition = Vector3.Lerp(initialPosition, targetPosition, progress);
+            //adjust the positions of the parts
+            for (int x = 0; x < m_list_bodyParts.Count; x++)
+                m_list_bodyParts[x].localPosition = Vector3.Lerp(initialPositions[x], targetPositions[x], progress);
             
             //increment the progress
             progress += Time.deltaTime;
