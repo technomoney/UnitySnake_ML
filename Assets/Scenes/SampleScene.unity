@@ -1441,6 +1441,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pfb_bodyChunk: {fileID: 3835193187450997897, guid: 9ed99a180b862714ab8b5da3810547ae, type: 3}
   m_movementBearing: 0
+  m_list_bodyParts: []
   m_growBiggerAfterMovement: 0
 --- !u!1 &2000059594
 GameObject:

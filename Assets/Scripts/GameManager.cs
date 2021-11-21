@@ -21,7 +21,8 @@ public class GameManager : MonoBehaviour
     {
         //update our testing info
 
-        m_text.text = "Bearing: " + snake.m_movementBearing + "\n" +
+        m_text.text = "Bearing: " + snake.m_movementBearing + "("+snake.m_movementBearing* Mathf.Rad2Deg+")"+"\n" +
+                      "Head: " + snake.m_list_bodyParts[0].localRotation.eulerAngles.y+"\n"+
                       "Score: " + Score;
     }
 }

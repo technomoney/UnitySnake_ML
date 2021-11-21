@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
@@ -21,7 +20,7 @@ public class Snake : MonoBehaviour
     /// <summary>
     /// List to hold all the parts of the snake
     /// </summary>
-    private List<Transform> m_list_bodyParts;
+    public List<Transform> m_list_bodyParts;
 
     /// <summary>
     /// we can use a flag here to tell the snake to grow after we finish our current movement lerp
@@ -78,13 +77,13 @@ public class Snake : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
-                m_movementBearing -= 1.57f;
+                m_movementBearing += 1.57f;
                 ClampMovementBearing();
             }
 
             if (Input.GetKeyDown(KeyCode.Q))
             {
-                m_movementBearing += 1.57f;
+                m_movementBearing -= 1.57f;
                 ClampMovementBearing();
             }
         }
@@ -105,16 +104,16 @@ public class Snake : MonoBehaviour
         }
         
         //check if our head/bearing rotations are different
-        if (Mathf.Abs(m_movementBearing * Mathf.Rad2Deg - m_list_bodyParts[0].transform.localRotation.y) <
+        if (Mathf.Abs(m_movementBearing * -Mathf.Rad2Deg - m_list_bodyParts[0].transform.localRotation.eulerAngles.y) <
             m_headRotationTolerance) return;
 
         Debug.Log("getting ready to rotate, " + m_movementBearing * Mathf.Rad2Deg + " vs " +
-                  m_list_bodyParts[0].transform.localRotation.y);
+                  m_list_bodyParts[0].transform.localRotation.eulerAngles.y);
         
         var head = m_list_bodyParts[0];
         m_isHeadRotating = true;
         m_initialHeadRotation = head.transform.localRotation.eulerAngles;
-        m_targetHeadRotation = new Vector3(head.localRotation.x, m_movementBearing * Mathf.Rad2Deg, head.localRotation.z);
+        m_targetHeadRotation = new Vector3(head.localRotation.eulerAngles.x, m_movementBearing * -Mathf.Rad2Deg, head.localRotation.eulerAngles.z);
 
 
         //rotate the camera to match the movement direction
