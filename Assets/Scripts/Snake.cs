@@ -18,7 +18,7 @@ public class Snake : MonoBehaviour
     /// <summary>
     /// the current direction the snake is moving, in rads
     /// </summary>
-    private float m_movementBearing = 0;
+    public float m_movementBearing = 0;
 
     /// <summary>
     /// List to hold all the parts of the snake
@@ -66,6 +66,19 @@ public class Snake : MonoBehaviour
         m_list_bodyParts[0].transform.rotation = Quaternion.Euler(0, m_movementBearing*-Mathf.Rad2Deg, 0);
         
         HandlePause();
+    }
+
+    /// <summary>
+    /// keep our bearing to nice 0-360 numbers
+    /// </summary>
+    private void ClampMovementBearing()
+    {
+        if (m_movementBearing < -0) m_movementBearing += 6.28f;
+        if (m_movementBearing > 6.28f) m_movementBearing -= 6.28f;
+
+        //this might be more superstition than anything, but it makes me feel better
+        if (m_movementBearing == 6.28f) m_movementBearing = 0;
+
     }
 
     /// <summary>
@@ -171,5 +184,8 @@ public class Snake : MonoBehaviour
         //this will remove andy weird rounding/lerp errors
         for (int x = 0; x < m_list_bodyParts.Count; x++)
             m_list_bodyParts[x].localPosition = targetPositions[x];
+        
+        //lets also fix the rotation of the tail
+        m_list_bodyParts.Last().transform.rotation = Quaternion.Euler(0, m_movementBearing * -Mathf.Rad2Deg, 0);
     }
 }
