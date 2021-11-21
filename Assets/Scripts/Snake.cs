@@ -1,9 +1,5 @@
-using System;
-using System.CodeDom.Compiler;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
@@ -50,7 +46,6 @@ public class Snake : MonoBehaviour
         AddBodyChunk();
         AddBodyChunk();
         AddBodyChunk();
-
     }
 
     void Update()
@@ -121,6 +116,9 @@ public class Snake : MonoBehaviour
         var newPos = new Vector3(tail.localPosition.x - Mathf.Cos(m_movementBearing), 0,
             tail.localPosition.z - Mathf.Sin(m_movementBearing));
         tail.transform.localPosition = newPos;
+        
+        //every time we add a chunk, increase our score
+        GameManager.Score++;
     }
 
     /// <summary>
