@@ -138,6 +138,8 @@ public class Snake : MonoBehaviour
     /// </summary>
     private void HandleMovement()
     {
+        //set the target positions of each body parts, we'll initialize the the list with the target
+        //for the head which we can grab with the current bearing and simple trig
         var targetPositions = new List<Vector3>
         {
             new Vector3(
@@ -151,9 +153,20 @@ public class Snake : MonoBehaviour
             //in the loop (keeping the loop in order i.e. swapping the tail is key here)
             targetPositions.Add(m_list_bodyParts[x - 1].localPosition);
         }
+        
+        
+        //lets also fix the rotation of the tail
+        //the rotation doesn't necessarily care about the current heading, more about the which direction we just
+        //moved, so let's figure that out.  this is also a little tricky in that we lose our initial position after
+        //we move, so we do this after we set targets, but before we actually move to them
+        var initialPos = new Vector2(m_list_bodyParts.Last().localPosition.x, m_list_bodyParts.Last().localPosition.z);
+        var targetPos = new Vector2(targetPositions.Last().x, targetPositions.Last().z);
+        var diff = targetPos - initialPos;
+        var ang = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
+        m_list_bodyParts.Last().transform.rotation = Quaternion.Euler(0, -ang, 0);
 
-        //we should also rectify the positions of the parts by manually setting them to their targets
-        //this will remove andy weird rounding/lerp errors
+        
+        //set the positions of the parts by manually setting them to their targets
         //we use the conditional check in the count to check against the list sizes of body parts and target positions
         //these can be different if we added a chunk, it's not an issue since we'll have already corrected their positions
         //in AddChunk(), but we'll still do the check here so we aren't getting out of range errors
@@ -170,6 +183,7 @@ public class Snake : MonoBehaviour
             if (part.localPosition.z > 40) part.localPosition = new Vector3(0, 0, -40);
         }
 
+        
         //done moving
         //when we're actually done moving start a pause
         StartCoroutine(HandlePause());
@@ -180,9 +194,6 @@ public class Snake : MonoBehaviour
             AddBodyChunk();
             m_growBiggerAfterMovement = false; //reset the flag
         }
-
-        //lets also fix the rotation of the tail
-        m_list_bodyParts.Last().transform.rotation = Quaternion.Euler(0, m_movementBearing * -Mathf.Rad2Deg, 0);
     }
 
     /// <summary>
