@@ -9,8 +9,8 @@ public class Snake : MonoBehaviour
     /// Prefab to make new parts of the snake body, assign in inspector
     /// </summary>
     public Transform pfb_bodyChunk;
-    
-    
+
+
     /// <summary>
     /// the current direction the snake is moving, in rads
     /// </summary>
@@ -36,6 +36,14 @@ public class Snake : MonoBehaviour
     }
 
     /// <summary>
+    /// should only need to be called once upon game run to get the snake moving
+    /// </summary>
+    private void StartMoving()
+    {
+        
+    }
+
+    /// <summary>
     /// add a chunk to the snake
     /// </summary>
     private void AddBodyChunk()
@@ -52,7 +60,7 @@ public class Snake : MonoBehaviour
         
         //we'll need to move the tail to stay behind everything else
         var tail = m_list_bodyParts.Last();
-        tail.transform.localPosition = new Vector3(0, 0, (m_list_bodyParts.Count+1) * -1);
+        tail.transform.localPosition = new Vector3(0, 0, (m_list_bodyParts.Count) * -1);
 
     }
 
@@ -64,7 +72,23 @@ public class Snake : MonoBehaviour
     {
         var newBodyChunk = m_list_bodyParts.Last();
         var listSize = m_list_bodyParts.Count;
-        m_list_bodyParts[listSize - 2] = m_list_bodyParts[listSize - 1];
+        m_list_bodyParts[listSize - 1] = m_list_bodyParts[listSize - 2];
         m_list_bodyParts[listSize - 2] = newBodyChunk;
+    }
+
+    /// <summary>
+    /// co routine to handle moving the head and then getting every body part to follow
+    /// </summary>
+    IEnumerator HandleMovement()
+    {
+        var targetPosition = new Vector3(transform.position.x + Mathf.Cos(m_movementBearing), GameManager.YPosition,
+            transform.position.z + Mathf.Sin(m_movementBearing));
+        var initialPosition = transform.position;
+        var progress = 0;
+
+        while (progress < 1)
+        {
+            yield return 0;
+        }
     }
 }
