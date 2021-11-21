@@ -1,3 +1,4 @@
+using System;
 using System.CodeDom.Compiler;
 using System.Collections;
 using System.Collections.Generic;
@@ -187,5 +188,10 @@ public class Snake : MonoBehaviour
         
         //lets also fix the rotation of the tail
         m_list_bodyParts.Last().transform.rotation = Quaternion.Euler(0, m_movementBearing * -Mathf.Rad2Deg, 0);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("collided with " + other.tag);
     }
 }
