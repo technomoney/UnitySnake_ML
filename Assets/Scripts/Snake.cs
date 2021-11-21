@@ -35,7 +35,7 @@ public class Snake : MonoBehaviour
     /// <summary>
     /// control how fast the snake moves
     /// </summary>
-    private float m_moveSpeed = 5f;
+    private float m_moveSpeed = 10f;
 
     /// <summary>
     /// we can pause slightly between each movement
@@ -49,6 +49,9 @@ public class Snake : MonoBehaviour
         //add the head and the tail initially to the body parts list
         m_list_bodyParts = new List<Transform> { transform.Find("Snake_Head"), transform.Find("Snake_Tail") };
         
+        AddBodyChunk();
+        AddBodyChunk();
+        AddBodyChunk();
         AddBodyChunk();
         AddBodyChunk();
         AddBodyChunk();
@@ -207,8 +210,19 @@ public class Snake : MonoBehaviour
         //these can be different if we added a chunk, it's not an issue since we'll have already corrected their positions
         //in AddChunk(), but we'll still do the check here so we aren't getting out of range errors
         for (int x = 0; x < m_list_bodyParts.Count - (targetPositions.Count == m_list_bodyParts.Count ? 0 : 1); x++)
+        {
             m_list_bodyParts[x].localPosition = targetPositions[x];
-        
+            
+            //lets also just check if we've moved to the other end of the world
+            //todo this is a little ugly, fix this if we have time
+            var part = m_list_bodyParts[x];
+            if (part.localPosition.x < -40) part.localPosition = new Vector3(40, 0, 0);
+            if (part.localPosition.x > 40) part.localPosition = new Vector3(-40, 0, 0);
+            if (part.localPosition.z < -40) part.localPosition = new Vector3(0, 0, 40);
+            if (part.localPosition.z > 40) part.localPosition = new Vector3(0,0, -40);
+
+        }
+
 
         //lets also fix the rotation of the tail
         m_list_bodyParts.Last().transform.rotation = Quaternion.Euler(0, m_movementBearing * -Mathf.Rad2Deg, 0);
