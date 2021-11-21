@@ -1146,7 +1146,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72a7585b691a64c4aa1454b4f509dbc9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pfb_bodyChunk: {fileID: 0}
+  pfb_bodyChunk: {fileID: 3835193187450997897, guid: 9ed99a180b862714ab8b5da3810547ae, type: 3}
 --- !u!1001 &3835193187488616272
 PrefabInstance:
   m_ObjectHideFlags: 0
