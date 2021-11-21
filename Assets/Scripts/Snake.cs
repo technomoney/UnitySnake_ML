@@ -37,7 +37,7 @@ public class Snake : MonoBehaviour
     /// </summary>
     private bool m_isPaused = false;
 
-    private float m_pauseTime = .1f;
+    private float m_pauseTime = .07f;
     private float m_pauseProgress = 0;
     
     void Start()
@@ -105,16 +105,19 @@ public class Snake : MonoBehaviour
         var chunk = Instantiate(pfb_bodyChunk, transform);
         m_list_bodyParts.Add(chunk);
         
-        //plop the new part right behind the head, we use the -2 here since we don't need to count the head/tail
-        chunk.transform.localPosition = new Vector3((m_list_bodyParts.Count - 2) * -1, 0, 0);
-        
         //let's keep the tail at the back of the list
         MoveTailToEndOfList();
         
+        //put the new chunk right where the tail currently is, then we'll bump the tail accordingly
+        //chunk.transform.localPosition = new Vector3((m_list_bodyParts.Count - 2) * -1, 0, 0);
+        chunk.transform.localPosition = m_list_bodyParts.Last().localPosition;
+        
         //we'll need to move the tail to stay behind everything else
         var tail = m_list_bodyParts.Last();
-        tail.transform.localPosition = new Vector3((m_list_bodyParts.Count - 1) * -1, 0, 0);
-
+        //his new position should depend on the direction he's currently facing...
+        var newPos = new Vector3(tail.localPosition.x - Mathf.Cos(m_movementBearing), 0,
+            tail.localPosition.z - Mathf.Sin(m_movementBearing));
+        tail.transform.localPosition = newPos;
     }
 
     /// <summary>
@@ -187,20 +190,24 @@ public class Snake : MonoBehaviour
         //when we're actually done moving start a pause
         m_isPaused = true;
         
-        //we should also rectify the positions of the parts by manually setting them to their targets
-        //this will remove andy weird rounding/lerp errors
-        for (int x = 0; x < m_list_bodyParts.Count; x++)
-            m_list_bodyParts[x].localPosition = targetPositions[x];
-        
-        //lets also fix the rotation of the tail
-        m_list_bodyParts.Last().transform.rotation = Quaternion.Euler(0, m_movementBearing * -Mathf.Rad2Deg, 0);
-        
         //see if we ate something and need to grow
         if (m_growBiggerAfterMovement)
         {
             AddBodyChunk();
             m_growBiggerAfterMovement = false; //reset the flag
         }
+        
+        //we should also rectify the positions of the parts by manually setting them to their targets
+        //this will remove andy weird rounding/lerp errors
+        //we use the conditional check in the count to check against the list sizes of body parts and target positions
+        //these can be different if we added a chunk, it's not an issue since we'll have already corrected their positions
+        //in AddChunk(), but we'll still do the check here so we aren't getting out of range errors
+        for (int x = 0; x < m_list_bodyParts.Count - (targetPositions.Count == m_list_bodyParts.Count ? 0 : 1); x++)
+            m_list_bodyParts[x].localPosition = targetPositions[x];
+        
+
+        //lets also fix the rotation of the tail
+        m_list_bodyParts.Last().transform.rotation = Quaternion.Euler(0, m_movementBearing * -Mathf.Rad2Deg, 0);
     }
 
     private void OnTriggerEnter(Collider other)

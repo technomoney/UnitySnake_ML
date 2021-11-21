@@ -429,7 +429,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 231908529}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.31, y: 0, z: 0}
+  m_LocalPosition: {x: 2, y: 0, z: 0}
   m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1124,6 +1124,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc6a02a93c5e9b84eadbd569980f0f4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_snake: {fileID: 1897290470}
 --- !u!1 &1268564349
 GameObject:
   m_ObjectHideFlags: 0
@@ -1149,7 +1150,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1268564349}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.08, y: 0, z: 0}
+  m_LocalPosition: {x: -1, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 964663581}
@@ -1440,6 +1441,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pfb_bodyChunk: {fileID: 3835193187450997897, guid: 9ed99a180b862714ab8b5da3810547ae, type: 3}
   m_movementBearing: 0
+  m_growBiggerAfterMovement: 0
 --- !u!1 &2000059594
 GameObject:
   m_ObjectHideFlags: 0
