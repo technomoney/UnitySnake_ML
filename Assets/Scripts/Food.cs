@@ -40,7 +40,7 @@ public class Food : MonoBehaviour
     {
         if (!other.tag.Equals("Body")) return;
         
-        //presumably the only way this happens is if we spawn on top of it so..... let's just respqan
+        //presumably the only way this happens is if we spawn on top of it so..... let's just respawn again
         Respawn();
     }
 }

@@ -1,9 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Easy helper class for the UI and score
+/// </summary>
 public class GameManager : MonoBehaviour
 {
     public Snake snake;
@@ -11,7 +12,7 @@ public class GameManager : MonoBehaviour
     public static GameManager Inst;
 
     public TextMeshProUGUI m_text_score, m_text_banner;
-    // Start is called before the first frame update
+
     void Start()
     {
         Inst = this;
@@ -24,6 +25,7 @@ public class GameManager : MonoBehaviour
     {
         m_text_score.text = "Score: " + Score;
 
+        //we could lock this behind the gameover screen, but this is handy for testing...
         if (Input.GetKeyDown(KeyCode.P))
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
