@@ -27,6 +27,12 @@ public class Snake : MonoBehaviour
     private List<Transform> m_list_bodyParts;
 
     /// <summary>
+    /// we can use a flag here to tell the snake to grow after we finish our current movement lerp
+    /// this will stop the snake from growing during a lerp and getting an index out of range error
+    /// </summary>
+    public bool m_growBiggerAfterMovement = false;
+
+    /// <summary>
     /// we can pause slightly between each movement
     /// </summary>
     private bool m_isPaused = false;
@@ -188,6 +194,13 @@ public class Snake : MonoBehaviour
         
         //lets also fix the rotation of the tail
         m_list_bodyParts.Last().transform.rotation = Quaternion.Euler(0, m_movementBearing * -Mathf.Rad2Deg, 0);
+        
+        //see if we ate something and need to grow
+        if (m_growBiggerAfterMovement)
+        {
+            AddBodyChunk();
+            m_growBiggerAfterMovement = false; //reset the flag
+        }
     }
 
     private void OnTriggerEnter(Collider other)

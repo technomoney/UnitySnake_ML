@@ -9,7 +9,7 @@ public class HeadCollider : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         if (!other.tag.Equals("Food")) return;
-        
-        m_snake.AddBodyChunk();
+
+        m_snake.m_growBiggerAfterMovement = true;
     }
 }
