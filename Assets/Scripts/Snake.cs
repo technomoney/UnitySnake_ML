@@ -61,14 +61,14 @@ public class Snake : MonoBehaviour
         m_list_bodyParts.Add(chunk);
         
         //plop the new part right behind the head, we use the -2 here since we don't need to count the head/tail
-        chunk.transform.localPosition = new Vector3(0, 0, (m_list_bodyParts.Count - 2) * -1);
+        chunk.transform.localPosition = new Vector3((m_list_bodyParts.Count - 2) * -1, 0, 0);
         
         //let's keep the tail at the back of the list
         MoveTailToEndOfList();
         
         //we'll need to move the tail to stay behind everything else
         var tail = m_list_bodyParts.Last();
-        tail.transform.localPosition = new Vector3(0, 0, (m_list_bodyParts.Count-1) * -1);
+        tail.transform.localPosition = new Vector3((m_list_bodyParts.Count - 1) * -1, 0, 0);
 
     }
 
